@@ -127,6 +127,7 @@
     #qrVideo {
       max-width: 100%;
       border-radius: 12px;
+      background: #000;
     }
 
     .footer {
@@ -158,6 +159,62 @@
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    .turkish-drug-badge {
+      background: linear-gradient(45deg, #dc2626, #059669);
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-left: 8px;
+    }
+
+    .price-tag {
+      background: var(--success);
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 8px;
+      margin-left: 4px;
+    }
+
+    .qr-scanner-container {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .qr-scanner-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px;
+      height: 200px;
+      border: 2px solid var(--primary);
+      border-radius: 10px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .qr-scanner-overlay::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      border: 2px solid rgba(37, 99, 235, 0.3);
+      border-radius: 10px;
+      animation: qrScan 2s linear infinite;
+    }
+
+    @keyframes qrScan {
+      0% { border-color: rgba(37, 99, 235, 0.3); }
+      50% { border-color: rgba(37, 99, 235, 0.8); }
+      100% { border-color: rgba(37, 99, 235, 0.3); }
+    }
   </style>
 </head>
 <body>
@@ -187,7 +244,7 @@
   <section class="hero">
     <div class="container text-center">
       <h1>Doğru Bilgi ve Akıllı İlaç Yönetimi</h1>
-      <p class="lead">Kutudaki QR kodu okut, ilacın adını yaz veya fotoğrafını yükle; güvenilir prospektüs verilerine ulaş ve evdeki ilaçlarını takip et.</p>
+      <p class="lead">Türk ve uluslararası ilaçları ara, QR kodu okut, fotoğrafını yükle; güvenilir bilgilere ulaş ve evdeki ilaçlarını takip et.</p>
       <div class="mt-4">
         <a href="#search" class="btn btn-light btn-lg me-3">
           <i class="fas fa-search me-2"></i>İlaç Ara
@@ -204,7 +261,10 @@
     <div class="container">
       <div class="card">
         <div class="card-header bg-white">
-          <h2 class="card-title mb-0"><i class="fas fa-search me-2"></i>İlaç Arama</h2>
+          <h2 class="card-title mb-0">
+            <i class="fas fa-search me-2"></i>İlaç Arama
+            <small class="text-muted d-block mt-1">Türk ilaçları ve uluslararası veritabanı</small>
+          </h2>
         </div>
         <div class="card-body">
           <!-- Search Tabs -->
@@ -233,7 +293,10 @@
               <div class="row">
                 <div class="col-md-8">
                   <label for="drugSearch" class="form-label">İlaç Adı</label>
-                  <input type="text" class="form-control" id="drugSearch" placeholder="Örn. Parol, Aspirin">
+                  <input type="text" class="form-control" id="drugSearch" placeholder="Örn. Parol, Aspirin, Nurofen, Majezik">
+                  <div class="form-text">
+                    <strong>Türk İlaçları:</strong> Parol, Nurofen, Majezik, Augmentin, Arveles, Minoset, Aprol Fort
+                  </div>
                 </div>
                 <div class="col-md-4 d-flex align-items-end">
                   <button class="btn btn-primary me-2" id="btnSearch">
@@ -250,7 +313,7 @@
             <div class="tab-pane fade" id="qr-panel">
               <div class="alert alert-info">
                 <i class="fas fa-info-circle me-2"></i>
-                QR kodunu kameraya tutarak GTIN, SKT gibi bilgileri çekebilirsiniz.
+                QR kodunu kameraya tutarak ilaç bilgilerini çekebilirsiniz.
               </div>
               <div class="mb-3">
                 <button class="btn btn-success me-2" id="btnStartQR">
@@ -262,12 +325,19 @@
               </div>
               <div class="row">
                 <div class="col-md-6">
-                  <video id="qrVideo" class="w-100" style="display: none;"></video>
+                  <div class="qr-scanner-container">
+                    <video id="qrVideo" class="w-100" style="display: none;"></video>
+                    <div class="qr-scanner-overlay" id="qrOverlay" style="display: none;"></div>
+                  </div>
+                  <canvas id="qrCanvas" style="display: none;"></canvas>
                 </div>
                 <div class="col-md-6">
                   <div id="qrResult" class="alert alert-secondary" style="display: none;">
                     <h6>QR Kod Sonucu:</h6>
                     <pre id="qrResultText"></pre>
+                  </div>
+                  <div id="qrStatus" class="alert alert-info" style="display: none;">
+                    <i class="fas fa-camera me-2"></i>Kamera hazırlanıyor...
                   </div>
                 </div>
               </div>
@@ -385,8 +455,8 @@
 
   <!-- Bootstrap 5 JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- ZXing Library for QR Code -->
-  <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js"></script>
+  <!-- jsQR Library - More Reliable QR Code Scanner -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   <!-- Tesseract.js for OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
 
@@ -394,12 +464,155 @@
     // Application State
     let medicines = JSON.parse(localStorage.getItem('medicines') || '[]');
     let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    let qrCodeReader = null;
+    let qrScanning = false;
     let stream = null;
+
+    // Turkish Drug Database
+    const TURKISH_DRUGS = [
+      {
+        brand_name: "Parol",
+        generic_name: "Parasetamol",
+        manufacturer: "Atabay İlaç",
+        active_ingredient: "Parasetamol",
+        dosage_form: "Tablet",
+        strength: "500 mg",
+        price: "25.08 ₺",
+        usage: "Ateş düşürücü ve hafif-orta şiddette ağrı kesici",
+        warnings: "Karaciğer hastalığı olan hastalarda dikkatli kullanılmalıdır. Günlük maksimum doz 4 gram geçilmemeli.",
+        indications: "Baş ağrısı, diş ağrısı, kas ağrıları, adet sancısı, ateş",
+        dosage: "Yetişkinler için günde 3-4 kez 500-1000 mg",
+        category: "turkish"
+      },
+      {
+        brand_name: "Nurofen",
+        generic_name: "İbuprofen",
+        manufacturer: "Reckitt Benckiser",
+        active_ingredient: "İbuprofen",
+        dosage_form: "Tablet",
+        strength: "400 mg",
+        price: "35.50 ₺",
+        usage: "Ağrı kesici, ateş düşürücü ve iltihaplanma azaltıcı",
+        warnings: "Mide ülseri riski, böbrek hastalarında dikkatli kullanım. Gebelikte son 3 ay kullanılmamalı.",
+        indications: "Baş ağrısı, diş ağrısı, adet sancısı, kas ağrıları, eklem ağrıları",
+        dosage: "Yetişkinler için günde 3-4 kez 200-400 mg",
+        category: "turkish"
+      },
+      {
+        brand_name: "Majezik",
+        generic_name: "Flurbiprofen",
+        manufacturer: "Sanofi",
+        active_ingredient: "Flurbiprofen",
+        dosage_form: "Tablet",
+        strength: "100 mg",
+        price: "43.31 ₺",
+        usage: "Eklem rahatsızlıklarında ağrı kesici ve iltihap önleyici",
+        warnings: "Gastrointestinal yan etkiler, böbrek fonksiyonları kontrolü gerekir. Kalp hastalığı riski.",
+        indications: "Romatoid artrit, osteoartrit, ankilozan spondilit, adet sancısı",
+        dosage: "Günde 2-3 kez 50-100 mg",
+        category: "turkish"
+      },
+      {
+        brand_name: "Augmentin",
+        generic_name: "Amoksisilin + Klavulanik Asit",
+        manufacturer: "GlaxoSmithKline",
+        active_ingredient: "Amoksisilin, Klavulanik Asit",
+        dosage_form: "Tablet",
+        strength: "875/125 mg",
+        price: "113.62 ₺",
+        usage: "Geniş spektrumlu antibiyotik",
+        warnings: "Alerjik reaksiyonlar, karaciğer fonksiyonları takibi. Doktor reçetesi gerekir.",
+        indications: "Solunum yolu enfeksiyonları, idrar yolu enfeksiyonları, cilt enfeksiyonları",
+        dosage: "Günde 2 kez 625 mg veya günde 2 kez 1 g",
+        category: "turkish"
+      },
+      {
+        brand_name: "Arveles",
+        generic_name: "Deksketoprofen",
+        manufacturer: "Menarini",
+        active_ingredient: "Deksketoprofen trometamol",
+        dosage_form: "Tablet",
+        strength: "25 mg",
+        price: "40.92 ₺",
+        usage: "Kısa süreli ağrı tedavisi",
+        warnings: "Kalp hastalığı riski, mide ülseri riski. Kısa süreli kullanım önerilir.",
+        indications: "Akut ağrı, kas iskelet sistemi ağrıları, diş ağrısı",
+        dosage: "Günde 3 kez 25 mg",
+        category: "turkish"
+      },
+      {
+        brand_name: "Minoset",
+        generic_name: "Naproksen",
+        manufacturer: "Pfizer",
+        active_ingredient: "Naproksen",
+        dosage_form: "Tablet",
+        strength: "550 mg",
+        price: "28.75 ₺",
+        usage: "Antiinflamatuar ağrı kesici",
+        warnings: "Kardiyovasküler risk, gastrointestinal kanama riski. Uzun süreli kullanımda doktor kontrolü.",
+        indications: "Romatoid artrit, osteoartrit, ankilozan spondilit",
+        dosage: "Günde 2 kez 275-550 mg",
+        category: "turkish"
+      },
+      {
+        brand_name: "Aprol Fort",
+        generic_name: "Naproksen Sodyum",
+        manufacturer: "Abdi İbrahim",
+        active_ingredient: "Naproksen sodyum",
+        dosage_form: "Tablet",
+        strength: "550 mg",
+        price: "32.19 ₺",
+        usage: "Ağrı kesici ve iltihap önleyici",
+        warnings: "Böbrek fonksiyonları, kalp hastalığı riski. Yaşlılarda dikkatli kullanım.",
+        indications: "Kas iskelet ağrıları, adet sancısı, baş ağrısı",
+        dosage: "Günde 2 kez 275-550 mg",
+        category: "turkish"
+      },
+      {
+        brand_name: "Aspirin",
+        generic_name: "Asetilsalisilik Asit",
+        manufacturer: "Bayer",
+        active_ingredient: "Asetilsalisilik asit",
+        dosage_form: "Tablet",
+        strength: "500 mg",
+        price: "18.90 ₺",
+        usage: "Ağrı kesici, ateş düşürücü, kan sulandırıcı",
+        warnings: "Kanama riski, mide ülseri, çocuklarda Reye sendromu riski. 16 yaş altında kullanılmamalı.",
+        indications: "Hafif-orta ağrı, ateş, kardiyovasküler koruma",
+        dosage: "Ağrı için günde 3-4 kez 500 mg, koruma için günde 100 mg",
+        category: "turkish"
+      },
+      {
+        brand_name: "Calpol",
+        generic_name: "Parasetamol",
+        manufacturer: "Johnson & Johnson",
+        active_ingredient: "Parasetamol",
+        dosage_form: "Şurup",
+        strength: "120 mg/5 ml",
+        price: "22.15 ₺",
+        usage: "Çocuklarda ateş düşürücü ve ağrı kesici",
+        warnings: "Çocuk dozajlarına dikkat edilmeli. Karaciğer hastalığında kullanılmamalı.",
+        indications: "Çocuklarda ateş, diş çıkarma ağrısı, aşı sonrası ateş",
+        dosage: "Çocuk yaşına ve kilosuna göre, günde 4 kez",
+        category: "turkish"
+      },
+      {
+        brand_name: "Voltaren",
+        generic_name: "Diklofenak",
+        manufacturer: "Novartis",
+        active_ingredient: "Diklofenak sodyum",
+        dosage_form: "Tablet",
+        strength: "50 mg",
+        price: "38.75 ₺",
+        usage: "Güçlü ağrı kesici ve iltihap önleyici",
+        warnings: "Kalp hastalığı riski, mide ülseri. Böbrek hastalığında dikkatli kullanım.",
+        indications: "Eklem ağrıları, kas ağrıları, sırt ağrısı, travma sonrası ağrı",
+        dosage: "Günde 2-3 kez 50 mg",
+        category: "turkish"
+      }
+    ];
 
     // OpenFDA API Configuration
     const FDA_LABEL_API = 'https://api.fda.gov/drug/label.json';
-    const FDA_ENFORCEMENT_API = 'https://api.fda.gov/drug/enforcement.json';
 
     // Initialize Application
     document.addEventListener('DOMContentLoaded', function() {
@@ -457,8 +670,27 @@
       resultsDiv.innerHTML = '<div class="text-center"><div class="loading"></div> Aranıyor...</div>';
 
       try {
-        const results = await searchOpenFDA(query);
-        displaySearchResults(results);
+        // First search Turkish database
+        const turkishResults = searchTurkishDatabase(query);
+        
+        // Then search OpenFDA
+        const fdaResults = await searchOpenFDA(query);
+        
+        // Combine results
+        const allResults = [...turkishResults, ...fdaResults];
+        
+        if (allResults.length === 0) {
+          resultsDiv.innerHTML = `
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle me-2"></i>
+              Aradığınız kriterlere uygun ilaç bulunamadı. <br>
+              <small>Önerilen Türk ilaçları: Parol, Nurofen, Majezik, Augmentin, Arveles</small>
+            </div>
+          `;
+          return;
+        }
+        
+        displaySearchResults(allResults);
       } catch (error) {
         console.error('Search error:', error);
         resultsDiv.innerHTML = `
@@ -470,7 +702,16 @@
       }
     }
 
-    async function searchOpenFDA(query, limit = 10) {
+    function searchTurkishDatabase(query) {
+      const searchTerm = query.toLowerCase();
+      return TURKISH_DRUGS.filter(drug => 
+        drug.brand_name.toLowerCase().includes(searchTerm) ||
+        drug.generic_name.toLowerCase().includes(searchTerm) ||
+        drug.active_ingredient.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    async function searchOpenFDA(query, limit = 5) {
       // Try brand name search first
       let url = `${FDA_LABEL_API}?search=openfda.brand_name:"${encodeURIComponent(query)}"&limit=${limit}`;
       
@@ -479,7 +720,7 @@
         if (response.ok) {
           const data = await response.json();
           if (data.results && data.results.length > 0) {
-            return data.results;
+            return data.results.map(drug => ({...drug, category: 'fda'}));
           }
         }
       } catch (error) {
@@ -494,26 +735,14 @@
         if (response.ok) {
           const data = await response.json();
           if (data.results && data.results.length > 0) {
-            return data.results;
+            return data.results.map(drug => ({...drug, category: 'fda'}));
           }
         }
       } catch (error) {
         console.warn('Generic name search failed:', error);
       }
 
-      // Try broader search
-      url = `${FDA_LABEL_API}?search=${encodeURIComponent(query)}&limit=${limit}`;
-      
-      const response = await fetch(url);
-      if (!response.ok) {
-        if (response.status === 404) {
-          return [];
-        }
-        throw new Error(`API hatası: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.results || [];
+      return [];
     }
 
     function displaySearchResults(results) {
@@ -532,52 +761,98 @@
       let html = '<h4 class="mb-3">Arama Sonuçları</h4>';
       
       results.forEach((drug, index) => {
-        const openfda = drug.openfda || {};
-        const brandName = openfda.brand_name?.[0] || 'Bilinmeyen';
-        const genericName = openfda.generic_name?.[0] || 'Bilinmeyen';
-        const manufacturer = openfda.manufacturer_name?.[0] || 'Bilinmeyen';
-        const activeIngredient = drug.active_ingredient?.[0] || genericName;
-        const dosageForm = openfda.dosage_form?.[0] || 'Bilinmeyen';
-        const strength = openfda.strength?.[0] || '';
-        
-        const isFavorite = favorites.includes(brandName);
-        
-        html += `
-          <div class="medicine-card card mb-3 fade-in">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-start">
-                <div class="flex-grow-1">
-                  <h5 class="card-title">${brandName}</h5>
-                  <p class="card-text text-muted mb-2">${genericName}</p>
-                  <div class="row">
-                    <div class="col-md-6">
-                      <small class="text-muted"><strong>Etken Madde:</strong> ${activeIngredient}</small><br>
-                      <small class="text-muted"><strong>Dozaj Formu:</strong> ${dosageForm}</small><br>
-                      ${strength ? `<small class="text-muted"><strong>Güç:</strong> ${strength}</small><br>` : ''}
-                      <small class="text-muted"><strong>Üretici:</strong> ${manufacturer}</small>
-                    </div>
-                    <div class="col-md-6">
-                      ${drug.warnings ? `<small class="text-danger"><strong>Uyarılar:</strong> ${drug.warnings[0].substring(0, 100)}...</small><br>` : ''}
-                      ${drug.indications_and_usage ? `<small class="text-success"><strong>Kullanım:</strong> ${drug.indications_and_usage[0].substring(0, 100)}...</small>` : ''}
+        if (drug.category === 'turkish') {
+          // Turkish drug display
+          html += `
+            <div class="medicine-card card mb-3 fade-in">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="flex-grow-1">
+                    <h5 class="card-title">
+                      ${drug.brand_name}
+                      <span class="turkish-drug-badge">🇹🇷 TÜRK İLACI</span>
+                      ${drug.price ? `<span class="price-tag">${drug.price}</span>` : ''}
+                    </h5>
+                    <p class="card-text text-muted mb-2">${drug.generic_name}</p>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <small class="text-muted"><strong>Etken Madde:</strong> ${drug.active_ingredient}</small><br>
+                        <small class="text-muted"><strong>Dozaj Formu:</strong> ${drug.dosage_form}</small><br>
+                        <small class="text-muted"><strong>Güç:</strong> ${drug.strength}</small><br>
+                        <small class="text-muted"><strong>Üretici:</strong> ${drug.manufacturer}</small>
+                      </div>
+                      <div class="col-md-6">
+                        <small class="text-success"><strong>Kullanım:</strong> ${drug.usage}</small><br>
+                        <small class="text-danger"><strong>Uyarı:</strong> ${drug.warnings.substring(0, 80)}...</small>
+                      </div>
                     </div>
                   </div>
+                  <div class="ms-3">
+                    <i class="fas fa-star favorite-star ${favorites.includes(drug.brand_name) ? 'text-warning' : 'text-muted'}" 
+                       onclick="toggleFavorite('${drug.brand_name.replace(/'/g, "\\'")}')" title="Favorilere ekle/çıkar"></i>
+                  </div>
                 </div>
-                <div class="ms-3">
-                  <i class="fas fa-star favorite-star ${isFavorite ? 'text-warning' : 'text-muted'}" 
-                     onclick="toggleFavorite('${brandName.replace(/'/g, "\\'")}')" title="Favorilere ekle/çıkar"></i>
+                <div class="mt-3">
+                  <button class="btn btn-outline-primary btn-sm me-2" onclick="addToCabinet('${drug.brand_name.replace(/'/g, "\\'")}', '${drug.active_ingredient.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-plus me-1"></i>Dolaba Ekle
+                  </button>
+                  <button class="btn btn-outline-info btn-sm" onclick="showTurkishDrugDetails(${index})">
+                    <i class="fas fa-info-circle me-1"></i>Detaylar
+                  </button>
                 </div>
-              </div>
-              <div class="mt-3">
-                <button class="btn btn-outline-primary btn-sm me-2" onclick="addToCabinet('${brandName.replace(/'/g, "\\'")}', '${activeIngredient.replace(/'/g, "\\'")}')">
-                  <i class="fas fa-plus me-1"></i>Dolaba Ekle
-                </button>
-                <button class="btn btn-outline-info btn-sm" onclick="showDrugDetails(${index})" data-bs-toggle="modal" data-bs-target="#drugModal">
-                  <i class="fas fa-info-circle me-1"></i>Detaylar
-                </button>
               </div>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          // FDA drug display
+          const openfda = drug.openfda || {};
+          const brandName = openfda.brand_name?.[0] || 'Bilinmeyen';
+          const genericName = openfda.generic_name?.[0] || 'Bilinmeyen';
+          const manufacturer = openfda.manufacturer_name?.[0] || 'Bilinmeyen';
+          const activeIngredient = drug.active_ingredient?.[0] || genericName;
+          const dosageForm = openfda.dosage_form?.[0] || 'Bilinmeyen';
+          const strength = openfda.strength?.[0] || '';
+          
+          html += `
+            <div class="medicine-card card mb-3 fade-in">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="flex-grow-1">
+                    <h5 class="card-title">
+                      ${brandName}
+                      <span class="badge bg-primary">🌍 FDA</span>
+                    </h5>
+                    <p class="card-text text-muted mb-2">${genericName}</p>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <small class="text-muted"><strong>Etken Madde:</strong> ${activeIngredient}</small><br>
+                        <small class="text-muted"><strong>Dozaj Formu:</strong> ${dosageForm}</small><br>
+                        ${strength ? `<small class="text-muted"><strong>Güç:</strong> ${strength}</small><br>` : ''}
+                        <small class="text-muted"><strong>Üretici:</strong> ${manufacturer}</small>
+                      </div>
+                      <div class="col-md-6">
+                        ${drug.warnings ? `<small class="text-danger"><strong>Uyarılar:</strong> ${drug.warnings[0].substring(0, 100)}...</small><br>` : ''}
+                        ${drug.indications_and_usage ? `<small class="text-success"><strong>Kullanım:</strong> ${drug.indications_and_usage[0].substring(0, 100)}...</small>` : ''}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ms-3">
+                    <i class="fas fa-star favorite-star ${favorites.includes(brandName) ? 'text-warning' : 'text-muted'}" 
+                       onclick="toggleFavorite('${brandName.replace(/'/g, "\\'")}')" title="Favorilere ekle/çıkar"></i>
+                  </div>
+                </div>
+                <div class="mt-3">
+                  <button class="btn btn-outline-primary btn-sm me-2" onclick="addToCabinet('${brandName.replace(/'/g, "\\'")}', '${activeIngredient.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-plus me-1"></i>Dolaba Ekle
+                  </button>
+                  <button class="btn btn-outline-info btn-sm" onclick="showFDADrugDetails(${index})">
+                    <i class="fas fa-info-circle me-1"></i>Detaylar
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }
       });
 
       resultsDiv.innerHTML = html;
@@ -591,66 +866,128 @@
       document.getElementById('searchResults').innerHTML = '';
     }
 
-    // QR Code Functions
+    // QR Code Functions - Updated with jsQR
     async function startQRScanning() {
       try {
         const video = document.getElementById('qrVideo');
+        const canvas = document.getElementById('qrCanvas');
+        const context = canvas.getContext('2d');
+        const overlay = document.getElementById('qrOverlay');
+        const statusDiv = document.getElementById('qrStatus');
+
+        statusDiv.style.display = 'block';
+        statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Kamera açılıyor...';
+
         const constraints = {
-          video: { facingMode: 'environment' }
+          video: { 
+            facingMode: 'environment',
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          }
         };
 
         stream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = stream;
         video.style.display = 'block';
-        video.play();
+        overlay.style.display = 'block';
+        
+        await video.play();
+        
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-        // Check if ZXing is available
-        if (typeof ZXing !== 'undefined') {
-          qrCodeReader = new ZXing.BrowserQRCodeReader();
-          
-          qrCodeReader.decodeFromVideoDevice(null, video, (result, err) => {
-            if (result) {
-              document.getElementById('qrResultText').textContent = result.text;
-              document.getElementById('qrResult').style.display = 'block';
-              
-              // Try to extract drug information from QR code
-              processQRResult(result.text);
-            }
-          });
-        } else {
-          showAlert('QR kod okuyucu yüklenemedi. Lütfen sayfayı yenileyin.', 'danger');
-        }
+        statusDiv.innerHTML = '<i class="fas fa-camera me-2"></i>QR kodu tarıyor...';
+        qrScanning = true;
+
+        // Start QR scanning loop
+        scanQRCode();
 
       } catch (error) {
         console.error('QR scanning error:', error);
+        document.getElementById('qrStatus').innerHTML = 
+          `<i class="fas fa-exclamation-triangle me-2"></i>Kamera erişimi başarısız: ${error.message}`;
         showAlert('Kamera erişimi başarısız: ' + error.message, 'danger');
       }
     }
 
+    function scanQRCode() {
+      if (!qrScanning) return;
+
+      const video = document.getElementById('qrVideo');
+      const canvas = document.getElementById('qrCanvas');
+      const context = canvas.getContext('2d');
+
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        
+        // Check if jsQR is available
+        if (typeof jsQR !== 'undefined') {
+          const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert",
+          });
+
+          if (code) {
+            document.getElementById('qrResultText').textContent = code.data;
+            document.getElementById('qrResult').style.display = 'block';
+            document.getElementById('qrStatus').innerHTML = 
+              '<i class="fas fa-check-circle me-2"></i>QR kod başarıyla okundu!';
+            
+            // Process QR result
+            processQRResult(code.data);
+            
+            // Stop scanning after successful read
+            setTimeout(() => stopQRScanning(), 2000);
+            return;
+          }
+        }
+      }
+
+      if (qrScanning) {
+        requestAnimationFrame(scanQRCode);
+      }
+    }
+
     function stopQRScanning() {
+      qrScanning = false;
+      
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
         stream = null;
       }
-      if (qrCodeReader) {
-        qrCodeReader.reset();
-      }
+      
       document.getElementById('qrVideo').style.display = 'none';
+      document.getElementById('qrOverlay').style.display = 'none';
       document.getElementById('qrResult').style.display = 'none';
+      document.getElementById('qrStatus').style.display = 'none';
     }
 
     function processQRResult(qrText) {
       // Extract potential drug names or codes from QR
-      const words = qrText.split(/[\s,;]+/).filter(word => word.length > 2);
-      if (words.length > 0) {
-        const potentialDrugName = words[0];
-        document.getElementById('drugSearch').value = potentialDrugName;
-        
-        // Switch to text tab and perform search
-        const textTab = new bootstrap.Tab(document.getElementById('text-tab'));
-        textTab.show();
-        setTimeout(() => performSearch(), 500);
+      const words = qrText.split(/[\s,;:\-_]+/).filter(word => word.length > 2);
+      
+      // Look for common Turkish drug names in QR code
+      const foundDrug = TURKISH_DRUGS.find(drug => 
+        words.some(word => 
+          drug.brand_name.toLowerCase().includes(word.toLowerCase()) ||
+          drug.generic_name.toLowerCase().includes(word.toLowerCase())
+        )
+      );
+
+      if (foundDrug) {
+        document.getElementById('drugSearch').value = foundDrug.brand_name;
+      } else if (words.length > 0) {
+        // Use first meaningful word
+        document.getElementById('drugSearch').value = words[0];
       }
+      
+      // Switch to text tab and perform search
+      const textTab = new bootstrap.Tab(document.getElementById('text-tab'));
+      textTab.show();
+      setTimeout(() => performSearch(), 500);
     }
 
     // OCR Functions
@@ -689,15 +1026,26 @@
         resultDiv.style.display = 'block';
         progressDiv.style.display = 'none';
 
-        // Extract first meaningful word for search
+        // Extract drug name from OCR text
         const words = text.split(/\s+/).filter(word => word.length > 2);
-        if (words.length > 0) {
+        
+        // Look for Turkish drug names
+        const foundDrug = TURKISH_DRUGS.find(drug => 
+          words.some(word => 
+            drug.brand_name.toLowerCase().includes(word.toLowerCase()) ||
+            drug.generic_name.toLowerCase().includes(word.toLowerCase())
+          )
+        );
+
+        if (foundDrug) {
+          document.getElementById('drugSearch').value = foundDrug.brand_name;
+        } else if (words.length > 0) {
           document.getElementById('drugSearch').value = words[0];
-          
-          // Switch to text tab
-          const textTab = new bootstrap.Tab(document.getElementById('text-tab'));
-          textTab.show();
         }
+        
+        // Switch to text tab
+        const textTab = new bootstrap.Tab(document.getElementById('text-tab'));
+        textTab.show();
 
       } catch (error) {
         console.error('OCR error:', error);
@@ -750,7 +1098,7 @@
       // Scroll to cabinet section
       document.getElementById('cabinet').scrollIntoView({ behavior: 'smooth' });
       
-      // Switch to cabinet tab if exists
+      // Focus on medicine name after scroll
       setTimeout(() => {
         document.getElementById('medicineName').focus();
       }, 500);
@@ -942,15 +1290,56 @@
       // Update UI
       const stars = document.querySelectorAll('.favorite-star');
       stars.forEach(star => {
-        if (star.onclick.toString().includes(drugName)) {
+        if (star.onclick && star.onclick.toString().includes(drugName)) {
           star.classList.toggle('text-warning');
           star.classList.toggle('text-muted');
         }
       });
     }
 
-    // Drug Details Modal
-    function showDrugDetails(index) {
+    // Drug Details Modal Functions
+    function showTurkishDrugDetails(index) {
+      const drug = TURKISH_DRUGS.find((d, i) => 
+        window.currentSearchResults && window.currentSearchResults[index] && 
+        window.currentSearchResults[index].brand_name === d.brand_name
+      );
+      
+      if (!drug) return;
+      
+      document.getElementById('drugModalTitle').textContent = drug.brand_name;
+      
+      let html = `
+        <div class="row">
+          <div class="col-md-6">
+            <h6>Temel Bilgiler</h6>
+            <p><strong>Marka Adı:</strong> ${drug.brand_name}</p>
+            <p><strong>Jenerik Adı:</strong> ${drug.generic_name}</p>
+            <p><strong>Üretici:</strong> ${drug.manufacturer}</p>
+            <p><strong>Dozaj Formu:</strong> ${drug.dosage_form}</p>
+            <p><strong>Güç:</strong> ${drug.strength}</p>
+            <p><strong>Fiyat:</strong> ${drug.price}</p>
+          </div>
+          <div class="col-md-6">
+            <h6>Klinik Bilgiler</h6>
+            <p><strong>Etken Madde:</strong> ${drug.active_ingredient}</p>
+            <p><strong>Kullanım Alanı:</strong> ${drug.usage}</p>
+            <p><strong>Dozaj:</strong> ${drug.dosage}</p>
+          </div>
+        </div>
+        <h6 class="mt-3">Endikasyonlar</h6>
+        <p class="small">${drug.indications}</p>
+        <h6 class="mt-3 text-danger">Uyarılar ve Yan Etkiler</h6>
+        <p class="small text-danger">${drug.warnings}</p>
+      `;
+      
+      document.getElementById('drugModalBody').innerHTML = html;
+      
+      // Show modal
+      const modal = new bootstrap.Modal(document.getElementById('drugModal'));
+      modal.show();
+    }
+
+    function showFDADrugDetails(index) {
       if (!window.currentSearchResults || !window.currentSearchResults[index]) return;
       
       const drug = window.currentSearchResults[index];
@@ -997,6 +1386,10 @@
       }
       
       document.getElementById('drugModalBody').innerHTML = html;
+      
+      // Show modal
+      const modal = new bootstrap.Modal(document.getElementById('drugModal'));
+      modal.show();
     }
 
     // Utility Functions
@@ -1025,7 +1418,7 @@
 
     // Error handling for failed script loads
     window.addEventListener('error', function(e) {
-      if (e.filename && (e.filename.includes('zxing') || e.filename.includes('tesseract'))) {
+      if (e.filename && (e.filename.includes('jsqr') || e.filename.includes('tesseract'))) {
         console.warn('External library failed to load:', e.filename);
       }
     });
