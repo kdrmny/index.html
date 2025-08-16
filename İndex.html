@@ -4,211 +4,63 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>İlaç Bilgi ve Yönetim Uygulaması</title>
-  <!-- Basit ama modern, responsive tasarım -->
   <style>
     :root {
-      --primary: #2563eb; /* ana mavi */
-      --secondary: #059669; /* yeşil vurgu */
-      --bg: #f9fafb; /* açık arka plan */
+      --primary: #2563eb;
+      --secondary: #059669;
+      --bg: #f9fafb;
       --card: #ffffff;
-      --text: #1f2937; /* koyu gri yazı */
-      --muted: #6b7280; /* soluk yazı */
-      --border: #e5e7eb; /* kenar çizgileri */
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
       --warn: #f59e0b;
       --danger: #dc2626;
       --ok: #16a34a;
     }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      line-height: 1.5;
-      background: var(--bg);
-      color: var(--text);
-    }
+    body { margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; line-height:1.5; background:var(--bg); color:var(--text); }
     a { color: var(--primary); text-decoration: none; }
-    .container {
-      width: 100%;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-    header {
-      background: var(--primary);
-      color: #fff;
-    }
-    header .container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 0;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 20px;
-    }
-    nav a {
-      margin-left: 16px;
-      color: #bfdbfe;
-      font-size: 14px;
-    }
-    .hero {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: #fff;
-      padding: 60px 0 80px;
-      text-align: center;
-    }
-    .hero h2 {
-      margin: 0 0 12px;
-      font-size: 32px;
-      font-weight: 700;
-    }
-    .hero p {
-      margin: 0 0 24px;
-      font-size: 16px;
-      color: #e0f2fe;
-    }
-    .btn {
-      display: inline-block;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .btn.primary {
-      background: #fff;
-      color: var(--primary);
-    }
-    .btn.primary:hover {
-      background: #e0e7ff;
-    }
-    .btn.secondary {
-      background: rgba(255,255,255,0.2);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.4);
-    }
-    .btn.secondary:hover {
-      background: rgba(255,255,255,0.3);
-    }
-    section {
-      padding: 40px 0;
-    }
-    section h2 {
-      margin: 0 0 20px;
-      font-size: 24px;
-      color: var(--text);
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-    }
-    .tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 16px;
-    }
-    .tabs button {
-      flex: 1;
-      padding: 8px 12px;
-      background: none;
-      border: none;
-      border-bottom: 3px solid transparent;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--muted);
-    }
-    .tabs button.act {
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-    .panel { display: none; }
-    .panel.act { display: block; }
-    input[type="text"], input[type="date"], textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 14px;
-    }
-    textarea { resize: vertical; min-height: 80px; }
-    label { font-size: 14px; font-weight: 600; margin-bottom: 4px; display: block; }
-    .form-row {
-      display: grid;
-      gap: 12px;
-    }
-    @media (min-width: 600px) {
-      .form-row.two { grid-template-columns: 1fr 1fr; }
-    }
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 12px;
-      margin: 2px 4px;
-      background: #eef2ff;
-      color: #4f46e5;
-    }
-    .pill.warn { background: #fef3c7; color: #b45309; }
-    .pill.danger { background: #fee2e2; color: #b91c1c; }
-    .pill.ok { background: #d1fae5; color: #065f46; }
-    .med-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .med-card h3 {
-      margin: 0 0 8px;
-      font-size: 20px;
-    }
-    .med-card .fav {
-      float: right;
-      cursor: pointer;
-      font-size: 22px;
-      color: var(--muted);
-    }
-    .med-card .fav.active { color: #f59e0b; }
-    .cab-list {
-      margin-top: 12px;
-    }
-    .cab-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 8px;
-      position: relative;
-    }
-    .cab-item.expired { border-color: var(--danger); }
-    .cab-item.soon { border-color: var(--warn); }
-    .cab-item .del {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      cursor: pointer;
-      color: var(--danger);
-      font-weight: 700;
-    }
-    footer {
-      background: var(--primary);
-      color: #fff;
-      padding: 20px 0;
-      text-align: center;
-    }
-    footer p {
-      margin: 0;
-      font-size: 14px;
-      color: #c7d2fe;
-    }
+    .container { width:100%; max-width:1100px; margin:0 auto; padding:0 16px; }
+    header { background:var(--primary); color:#fff; }
+    header .container { display:flex; align-items:center; justify-content:space-between; padding:16px 0; }
+    header h1 { margin:0; font-size:20px; }
+    nav a { margin-left:16px; color:#bfdbfe; font-size:14px; }
+    .hero { background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%); color:#fff; padding:60px 0 80px; text-align:center; }
+    .hero h2 { margin:0 0 12px; font-size:32px; font-weight:700; }
+    .hero p { margin:0 0 24px; font-size:16px; color:#e0f2fe; }
+    .btn { display:inline-block; padding:10px 16px; border-radius:8px; font-weight:600; font-size:14px; border:none; cursor:pointer; transition:background .2s; }
+    .btn.primary { background:#fff; color:var(--primary); }
+    .btn.primary:hover { background:#e0e7ff; }
+    .btn.secondary { background:rgba(255,255,255,.2); color:#fff; border:1px solid rgba(255,255,255,.4); }
+    .btn.secondary:hover { background:rgba(255,255,255,.3); }
+    section { padding:40px 0; }
+    section h2 { margin:0 0 20px; font-size:24px; color:var(--text); }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; box-shadow:0 2px 4px rgba(0,0,0,.04); }
+    .tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:16px; }
+    .tabs button { flex:1; padding:8px 12px; background:none; border:none; border-bottom:3px solid transparent; font-size:14px; font-weight:600; cursor:pointer; color:var(--muted); }
+    .tabs button.act { border-color:var(--primary); color:var(--primary); }
+    .panel { display:none; }
+    .panel.act { display:block; }
+    input[type="text"], input[type="date"], textarea { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; }
+    textarea { resize:vertical; min-height:80px; }
+    label { font-size:14px; font-weight:600; margin-bottom:4px; display:block; }
+    .form-row { display:grid; gap:12px; }
+    @media (min-width: 600px) { .form-row.two { grid-template-columns:1fr 1fr; } }
+    .pill { display:inline-flex; align-items:center; padding:4px 8px; border-radius:999px; font-size:12px; margin:2px 4px; background:#eef2ff; color:#4f46e5; }
+    .pill.warn { background:#fef3c7; color:#b45309; }
+    .pill.danger { background:#fee2e2; color:#b91c1c; }
+    .pill.ok { background:#d1fae5; color:#065f46; }
+    .med-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px; }
+    .med-card h3 { margin:0 0 8px; font-size:20px; }
+    .med-card .fav { float:right; cursor:pointer; font-size:22px; color:var(--muted); }
+    .med-card .fav.active { color:#f59e0b; }
+    .cab-list { margin-top:12px; }
+    .cab-item { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; position:relative; }
+    .cab-item.expired { border-color:var(--danger); }
+    .cab-item.soon { border-color:var(--warn); }
+    .cab-item .del { position:absolute; top:8px; right:8px; cursor:pointer; color:var(--danger); font-weight:700; }
+    footer { background:var(--primary); color:#fff; padding:20px 0; text-align:center; }
+    footer p { margin:0; font-size:14px; color:#c7d2fe; }
   </style>
 </head>
 <body>
@@ -233,17 +85,15 @@
     </div>
   </section>
 
-  <!-- İlaç Arama Bölümü -->
   <section id="search">
     <div class="container card">
       <h2>İlaç Arama</h2>
-      <!-- Tablar -->
       <div class="tabs" id="searchTabs">
         <button data-tab="text" class="act">Metin</button>
         <button data-tab="qr">QR</button>
         <button data-tab="ocr">Foto/OCR</button>
       </div>
-      <!-- Panel: Metin -->
+
       <div class="panel act" id="panel-text">
         <label for="q">İlaç Adı</label>
         <input id="q" type="text" placeholder="Örn. Parol" />
@@ -252,7 +102,7 @@
           <button class="btn" id="btnClearSearch">Temizle</button>
         </div>
       </div>
-      <!-- Panel: QR -->
+
       <div class="panel" id="panel-qr">
         <p class="pill warn" style="margin-bottom:8px;">QR kodunu kameraya tutarak GTIN, SKT gibi bilgileri çekebilirsiniz.</p>
         <div style="margin-bottom:8px;">
@@ -262,18 +112,17 @@
         <video id="qrVideo" width="100%" style="border-radius:8px;border:1px solid var(--border);"></video>
         <pre id="qrRaw" style="white-space:pre-wrap; margin-top:8px; color:var(--muted);"></pre>
       </div>
-      <!-- Panel: Foto/OCR -->
+
       <div class="panel" id="panel-ocr">
         <input type="file" id="imgFile" accept="image/*" />
         <p style="font-size:12px; color:var(--muted); margin-top:4px;">Kutudaki yazıyı içeren net fotoğraf yükleyin; ilk kelimeler otomatik aramaya girer.</p>
         <pre id="ocrOut" style="white-space:pre-wrap; margin-top:8px; color:var(--muted);"></pre>
       </div>
-      <!-- Sonuç kartları -->
+
       <div id="drugView" style="margin-top:20px;"></div>
     </div>
   </section>
 
-  <!-- Evdeki İlaç Dolabı Bölümü -->
   <section id="cabinet">
     <div class="container card">
       <h2>Evdeki İlaç Dolabı</h2>
@@ -290,7 +139,7 @@
         </div>
         <div class="form-row two" style="margin-top:12px;">
           <div>
-            <label for "cabExpiry">Son Kullanma Tarihi</label>
+            <label for="cabExpiry">Son Kullanma Tarihi</label>
             <input id="cabExpiry" type="date" />
           </div>
           <div>
@@ -313,12 +162,13 @@
     <p>Bu uygulama yalnızca bilgilendirme amaçlıdır; doktorunuza danışmadan tedavi kararı vermeyin.</p>
   </footer>
 
-  <!-- Gerekli kütüphaneler -->
+  <!-- Kütüphaneler -->
   <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
+
   <script>
-    // Tab navigasyonu
+    // Tabs
     const searchTabs = document.getElementById('searchTabs');
     const panels = {
       text: document.getElementById('panel-text'),
@@ -335,32 +185,25 @@
       }
     });
 
-    // openFDA API fonksiyonları
+    // openFDA
     const FDA_LABEL_API = 'https://api.fda.gov/drug/label.json';
     async function fetchOpenFDALabel(query, limit=15) {
       const term = encodeURIComponent(`openfda.brand_name:"${query}"`);
-      const url = \`\${FDA_LABEL_API}?search=\${term}&limit=\${limit}\`;
+      const url = `${FDA_LABEL_API}?search=${term}&limit=${limit}`;
       const res = await fetch(url);
-      if (!res.ok) {
-        if (res.status === 404) return [];
-        throw new Error('openFDA yanıt vermedi');
-      }
+      if (!res.ok) { if (res.status === 404) return []; throw new Error('openFDA yanıt vermedi'); }
       const data = await res.json();
       return data.results || [];
     }
     async function fetchByGenericName(generic, limit=20) {
       const term = encodeURIComponent(`openfda.generic_name:"${generic}"`);
-      const url = \`\${FDA_LABEL_API}?search=\${term}&limit=\${limit}\`;
+      const url = `${FDA_LABEL_API}?search=${term}&limit=${limit}`;
       const res = await fetch(url);
-      if (!res.ok) {
-        if (res.status === 404) return [];
-        throw new Error('openFDA yanıt vermedi');
-      }
+      if (!res.ok) { if (res.status === 404) return []; throw new Error('openFDA yanıt vermedi'); }
       const data = await res.json();
       return data.results || [];
     }
 
-    // Arama elementleri
     const searchInput = document.getElementById('q');
     const btnSearch = document.getElementById('btnSearch');
     const btnClearSearch = document.getElementById('btnClearSearch');
@@ -372,49 +215,30 @@
       drugView.innerHTML = '<div class="pill warn">Yükleniyor...</div>';
       try {
         const primary = await fetchOpenFDALabel(q, 15);
-        if (!primary.length) {
-          drugView.innerHTML = '<div class="pill danger">Sonuç bulunamadı.</div>';
-          return;
-        }
+        if (!primary.length) { drugView.innerHTML = '<div class="pill danger">Sonuç bulunamadı.</div>'; return; }
         const open = primary[0].openfda || {};
         const generics = open.generic_name || open.substance_name || [];
         const genericQueries = generics.slice(0, 3);
         const extra = [];
         for (const g of genericQueries) {
-          try {
-            const res = await fetchByGenericName(g, 15);
-            extra.push(...res);
-          } catch (err) {}
+          try { extra.push(...await fetchByGenericName(g, 15)); } catch {}
         }
         const combined = [...primary];
         const seen = new Set(primary.map(r => (r.openfda?.brand_name?.[0] || '') + (r.openfda?.product_ndc?.[0] || '')));
         extra.forEach(r => {
           const key = (r.openfda?.brand_name?.[0] || '') + (r.openfda?.product_ndc?.[0] || '');
-          if (!seen.has(key)) {
-            seen.add(key);
-            combined.push(r);
-          }
+          if (!seen.has(key)) { seen.add(key); combined.push(r); }
         });
         renderDrugInfo(combined);
       } catch (err) {
         drugView.innerHTML = '<div class="pill danger">API hatası: ' + err.message + '</div>';
       }
     });
-    btnClearSearch.addEventListener('click', () => {
-      searchInput.value = '';
-      drugView.innerHTML = '';
-    });
+    btnClearSearch.addEventListener('click', () => { searchInput.value = ''; drugView.innerHTML = ''; });
 
-    function shorten(text, max=500) {
-      if (!text) return '';
-      return text.length > max ? text.substring(0, max) + '…' : text;
-    }
-    function extractField(obj, fields) {
-      for (const f of fields) {
-        if (obj[f]) return Array.isArray(obj[f]) ? obj[f].join(' ') : obj[f];
-      }
-      return '';
-    }
+    function shorten(text, max=500) { if (!text) return ''; return text.length > max ? text.substring(0, max) + '…' : text; }
+    function extractField(obj, fields) { for (const f of fields) { if (obj[f]) return Array.isArray(obj[f]) ? obj[f].join(' ') : obj[f]; } return ''; }
+
     function renderDrugInfo(results) {
       const r0 = results[0];
       const open = r0.openfda || {};
@@ -428,20 +252,19 @@
       const textAll = (warnings + ' ' + adverse).toLowerCase();
       const alcohol = /alkol|alcohol/gi.test(textAll);
       const driving = /sürüş|drive|operate machinery|araç/gi.test(textAll);
+
       const altSet = new Set();
       const alternatives = [];
       for (let i = 1; i < results.length; i++) {
         const r = results[i];
         const bn = r.openfda?.brand_name?.[0];
         if (!bn) continue;
-        const norm = bn.toLowerCase().replace(/\\s+/g, ' ').trim();
-        const baseNorm = brand.toLowerCase().replace(/\\s+/g, ' ').trim();
+        const norm = bn.toLowerCase().replace(/\s+/g, ' ').trim();   /* düzeltildi */
+        const baseNorm = brand.toLowerCase().replace(/\s+/g, ' ').trim(); /* düzeltildi */
         if (norm === baseNorm) continue;
-        if (!altSet.has(norm)) {
-          altSet.add(norm);
-          alternatives.push(bn);
-        }
+        if (!altSet.has(norm)) { altSet.add(norm); alternatives.push(bn); }
       }
+
       let html = '';
       html += '<div class="med-card">';
       html += `<span class="fav" id="favStar">☆</span>`;
@@ -462,32 +285,19 @@
       html += `<div style="margin-top:12px;font-size:12px;color:var(--muted);">Kaynak: openFDA etiket verisi (<a href="https://api.fda.gov/drug/label.json?search=openfda.brand_name:%22${encodeURIComponent(brand)}%22" target="_blank">API</a>)</div>`;
       html += '</div>';
       drugView.innerHTML = html;
+
       const favStar = document.getElementById('favStar');
       if (isFavorite(brand)) favStar.classList.add('active');
-      favStar.addEventListener('click', () => {
-        toggleFavorite(brand);
-        favStar.classList.toggle('active');
-      });
+      favStar.addEventListener('click', () => { toggleFavorite(brand); favStar.classList.toggle('active'); });
     }
 
-    // Favoriler localStorage
-    function loadFavorites() {
-      try { return JSON.parse(localStorage.getItem('favorites') || '[]'); } catch { return []; }
-    }
-    function saveFavorites(list) {
-      localStorage.setItem('favorites', JSON.stringify(list));
-    }
-    function isFavorite(name) {
-      const favs = loadFavorites();
-      return favs.includes(name);
-    }
-    function toggleFavorite(name) {
-      let favs = loadFavorites();
-      if (favs.includes(name)) favs = favs.filter(x => x !== name); else favs.push(name);
-      saveFavorites(favs);
-    }
+    // Favoriler
+    function loadFavorites(){ try{return JSON.parse(localStorage.getItem('favorites')||'[]')}catch{return[]} }
+    function saveFavorites(list){ localStorage.setItem('favorites', JSON.stringify(list)); }
+    function isFavorite(name){ return loadFavorites().includes(name); }
+    function toggleFavorite(name){ let f=loadFavorites(); f=f.includes(name)?f.filter(x=>x!==name):[...f,name]; saveFavorites(f); }
 
-    // QR tarayıcı
+    // QR
     let qrScanner;
     const qrVideo = document.getElementById('qrVideo');
     const qrRaw = document.getElementById('qrRaw');
@@ -497,30 +307,23 @@
       try {
         const codeReader = new ZXing.BrowserMultiFormatReader();
         qrScanner = codeReader;
-        await codeReader.decodeFromVideoDevice(null, qrVideo, (result, err) => {
+        await codeReader.decodeFromVideoDevice(null, qrVideo, (result) => {
           if (result) {
             qrRaw.textContent = 'Veri: ' + result.getText();
             const text = result.getText();
-            const m = text.match(/01(\\d{14})17(\\d{6})10([^21]*)21(\\w+)/);
+            const m = text.match(/01(\d{14})17(\d{6})10([^21]*)21(\w+)/); /* düzeltildi */
             if (m) {
               const gtin = m[1];
               const exp = m[2];
-              const expiry = '20' + exp.substr(0, 2) + '-' + exp.substr(2, 2) + '-' + exp.substr(4, 2);
-              qrRaw.textContent += '\\nGTIN: ' + gtin + '\\nSKT: ' + expiry + '\\nLOT: ' + m[3].trim() + '\\nSeri: ' + m[4];
+              const expiry = '20' + exp.substr(0,2) + '-' + exp.substr(2,2) + '-' + exp.substr(4,2);
+              qrRaw.textContent += '\nGTIN: ' + gtin + '\nSKT: ' + expiry + '\nLOT: ' + m[3].trim() + '\nSeri: ' + m[4];
             }
           }
         });
-      } catch (err) {
-        qrRaw.textContent = 'Kamera hatası: ' + err;
-      }
+      } catch (err) { qrRaw.textContent = 'Kamera hatası: ' + err; }
     });
     document.getElementById('btnStopQR').addEventListener('click', () => {
-      if (qrScanner) {
-        qrScanner.reset();
-        qrScanner = null;
-        qrRaw.textContent = '';
-        qrVideo.srcObject = null;
-      }
+      if (qrScanner) { qrScanner.reset(); qrScanner = null; qrRaw.textContent=''; qrVideo.srcObject=null; }
     });
 
     // OCR
@@ -534,57 +337,44 @@
       reader.onload = async () => {
         const bytes = reader.result;
         try {
-          const { data: { text } } = await Tesseract.recognize(bytes, 'eng');
+          const { data:{ text } } = await Tesseract.recognize(bytes, 'eng');
           ocrOut.textContent = text.trim();
-          const words = text.trim().split(/\\s+/);
-          if (words.length) {
-            searchInput.value = words.slice(0, 3).join(' ');
-            btnSearch.click();
-          }
-        } catch (err) {
-          ocrOut.textContent = 'OCR hatası: ' + err;
-        }
+          const words = text.trim().split(/\s+/);
+          if (words.length) { searchInput.value = words.slice(0,3).join(' '); btnSearch.click(); }
+        } catch (err) { ocrOut.textContent = 'OCR hatası: ' + err; }
       };
       reader.readAsArrayBuffer(file);
     });
 
-    // Evdeki dolap yönetimi
+    // Dolap
     let cabData = [];
-    function loadCab() {
-      try { cabData = JSON.parse(localStorage.getItem('cabinet') || '[]'); } catch { cabData = []; }
-    }
-    function saveCab() {
-      localStorage.setItem('cabinet', JSON.stringify(cabData));
-    }
-    function renderCab() {
+    function loadCab(){ try{ cabData = JSON.parse(localStorage.getItem('cabinet')||'[]'); }catch{ cabData=[]; } }
+    function saveCab(){ localStorage.setItem('cabinet', JSON.stringify(cabData)); }
+    function renderCab(){
       const list = document.getElementById('cabList');
       const warnEl = document.getElementById('cabWarnings');
-      list.innerHTML = '';
-      warnEl.innerHTML = '';
-      const now = new Date();
-      const near = 30;
+      list.innerHTML=''; warnEl.innerHTML='';
+      const now = new Date(); const near = 30;
       const ingredientMap = {};
       cabData.forEach(item => {
-        (item.actives || []).forEach(ing => {
+        (item.actives||[]).forEach(ing => {
           const k = ing.toLowerCase().trim();
-          if (!ingredientMap[k]) ingredientMap[k] = [];
+          if (!ingredientMap[k]) ingredientMap[k]=[];
           ingredientMap[k].push(item.name);
         });
       });
       const conflicts = new Set();
-      Object.values(ingredientMap).forEach(arr => {
-        if (arr.length > 1) arr.forEach(n => conflicts.add(n));
-      });
+      Object.values(ingredientMap).forEach(arr => { if (arr.length>1) arr.forEach(n => conflicts.add(n)); });
+
       cabData.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'cab-item';
-        let expired = false, soon = false, expText = '';
-        if (item.expiry) {
+        const div = document.createElement('div'); div.className='cab-item';
+        let expired=false, soon=false, expText='';
+        if (item.expiry){
           const expDate = new Date(item.expiry);
-          const diff = Math.floor((expDate - now) / (1000*60*60*24));
-          if (!isNaN(diff)) {
-            if (diff < 0) { expired = true; expText = ' (süresi geçmiş)'; }
-            else if (diff <= near) { soon = true; expText = \` (yaklaşık \${diff} gün)\`; }
+          const diff = Math.floor((expDate - now)/(1000*60*60*24));
+          if (!isNaN(diff)){
+            if (diff < 0){ expired=true; expText=' (süresi geçmiş)'; }
+            else if (diff <= near){ soon=true; expText = ` (yaklaşık ${diff} gün)`; } /* düzeltildi */
           }
         }
         if (expired) div.classList.add('expired');
@@ -597,18 +387,15 @@
           <span class="del">&times;</span>
         `;
         div.querySelector('.del').addEventListener('click', () => {
-          cabData = cabData.filter(x => x !== item);
-          saveCab();
-          renderCab();
+          cabData = cabData.filter(x => x !== item); saveCab(); renderCab();
         });
         list.appendChild(div);
       });
-      if (conflicts.size) {
+      if (conflicts.size){
         warnEl.innerHTML = `<div class="pill warn">Uyarı: Aynı etken maddeyi içeren ilaçlar: ${[...conflicts].join(', ')}</div>`;
       }
     }
-    loadCab();
-    renderCab();
+    loadCab(); renderCab();
     document.getElementById('cabForm').addEventListener('submit', e => {
       e.preventDefault();
       const name = document.getElementById('cabName').value.trim();
@@ -616,24 +403,14 @@
       const expiry = document.getElementById('cabExpiry').value;
       const dose = document.getElementById('cabDose').value.trim();
       if (!name) return;
-      cabData.push({ name, actives, expiry, dose });
-      saveCab();
-      renderCab();
-      e.target.reset();
+      cabData.push({ name, actives, expiry, dose }); saveCab(); renderCab(); e.target.reset();
     });
     document.getElementById('btnClearCab').addEventListener('click', () => {
-      if (confirm('Tüm ilaçları silmek istediğinize emin misiniz?')) {
-        cabData = [];
-        saveCab();
-        renderCab();
-      }
+      if (confirm('Tüm ilaçları silmek istediğinize emin misiniz?')){ cabData=[]; saveCab(); renderCab(); }
     });
     document.getElementById('btnExport').addEventListener('click', () => {
-      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(cabData, null, 2));
-      const a = document.createElement('a');
-      a.setAttribute('href', dataStr);
-      a.setAttribute('download', 'cabinet.json');
-      a.click();
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(cabData,null,2));
+      const a = document.createElement('a'); a.href = dataStr; a.download = 'cabinet.json'; a.click();
     });
   </script>
 </body>
